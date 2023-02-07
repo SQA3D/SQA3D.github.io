@@ -149,7 +149,7 @@
               <div id="loading" style="position: absolute; left: 50%; top: 45%;"></div>
               <canvas id="webgl_scene" style="height: 50%; width: 50%;"></canvas>
             </div>
-            <p id="situation" style="margin: 0 1.5em; font-size: 0.8em; text-align:justify;"><span style="color: #fff143">Situation:</span></p>
+            <p id="sit_text" style="margin: 0 1.5em; font-size: 0.8em; text-align:justify;"><span style="color: #00ff00">Situation:</span></p>
             <p style="margin: 0 1.5em; font-size: 0.8em; text-align:justify;">Note: Click the select dropdown to select a scene and a corresponding situation in the scene. Drag to move your view around.</p>
           </div>
         </div>
@@ -223,20 +223,19 @@
 
   import * as THREE from 'three'
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-  import {PLYLoader} from 'three/addons/loaders/PLYLoader.js'
+  import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js'
   import qid2situation from './assets/qid2situation.json' assert {type: 'json'};
 
   // scene & situation visualization
   let canvas2 = document.querySelector('#webgl_scene')
   let scene2 = new THREE.Scene()
-  let assetLoader2 = new PLYLoader()
+  let assetLoader2 = new GLTFLoader()
   let model2
 
   let camera2 = new THREE.PerspectiveCamera(45, 1.618 / 1.0, 0.1, 100)
   camera2.position.set(0.25, 0.2, -0.25)
-  let grid2 = new THREE.GridHelper(30, 30)
+  camera2.add(new THREE.PointLight(0xffffff, 0.5))
   scene2.add(camera2)
-  scene2.add(grid2)
   for (let ax = 0; ax < 3; ax++) {
     for (let i = 0; i <= 1; i++) {
       let spotLight = new THREE.SpotLight(0xAAAAAA)
@@ -248,7 +247,7 @@
       scene2.add(spotLight)
     }
   }
-
+  scene2.add(new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6))
   let controls2 = new OrbitControls(camera2, canvas2)
   controls2.enableZoom = true
   // controls2.enableDamping = true
@@ -277,16 +276,17 @@
     }
     scene2.remove(model2)
     document.querySelector('#loading').innerHTML = `<img src="./assets/icons/loading.svg" width="48" height="48">`
-    let assetUrl = new URL(`./assets/${sceneSel.value}/${sitSel.value}.ply`, import.meta.url)
+    let assetUrl = new URL(`./assets/${sceneSel.value + "_00"}/${sitSel.value}.glb`, import.meta.url)
     for (var item in qid2situation) { 
       let situation_id = "situation_" + qid2situation[item]["number"]
-      if (qid2situation[item]["scene"] == sceneSel.value && situation_id == sitSel.value) {
-        document.querySelector("situation").innerText = "Situation: " + qid2situation[item]["situation"]
+      let scene_id = sceneSel.value + "_00"
+      if (qid2situation[item]["scene"] == scene_id && situation_id == sitSel.value) {
+        document.querySelector("#sit_text").innerHTML = `<span style="color: #00e400">Situation: ${qid2situation[item]["situation"]}</span>`
         break
       }
     }
-    assetLoader2.load(assetUrl.href, ply => {
-      model2 = ply.scene
+    assetLoader2.load(assetUrl.href, glb => {
+      model2 = glb.scene
       scene2.add(model2)
       document.querySelector('#loading').innerHTML = ''
     }, undefined, (error) => {console.error(error)})
@@ -299,7 +299,6 @@
   // resize renderers
   function resizeRenderers() {
     let content_width = document.querySelector('#results').offsetWidth
-    renderer1.setSize(content_width, content_width / 1.618)
     renderer2.setSize(content_width, content_width / 1.618)
   }
   window.addEventListener('resize', () => {
