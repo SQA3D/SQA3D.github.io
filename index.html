@@ -1,1 +1,312 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>SceneDiffuser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    hr {
+      background-color: #f1f1f1;
+    }
+    .table th {
+      padding: 0.2em 0.2em 0 0.2em;
+      width: 50%;
+    }
+    .table td {
+      padding: 0.25em;
+      width: 50%;
+    }
+    .content-block {
+      padding: 0 6px;
+    }
+    .title {
+      font-size: 32px;
+      padding-top: 32px;
+    }
+    .publisher {
+      margin-bottom: 1rem;
+    }
+    .sub-title {
+      font-size: 26px;
+      padding-bottom: 16px;
+    }
+    .subsub-title {
+      font-size: 20px;
+      padding-bottom: 8px;
+    }
+    .author {
+      font-size: 16px;
+    }
+    .task {
+      padding-bottom: 12px;
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+        "three": "https://unpkg.com/three@0.127.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.127.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div id="app">
+    <div class="columns">
+      <div class="column" :class="[content, offset]">
+
+        <h1 class="title has-text-centered" style="margin-bottom: 0.5em">
+            SQA3D: Situated Question Answering in 3D Scenes
+        </h1>
+
+        <!-- <p class="publisher has-text-centered">Conference</p> -->
+
+        <div class="has-text-centered" style="padding: 0 2em;">
+
+          <p class="author">
+            <a href="http://web.cs.ucla.edu/~xm">Xiaojian Ma</a><sup>1,2✶</sup> &nbsp;&nbsp;&nbsp;
+            <a href="https://silongyong.github.io/">Silong Yong</a><sup>1,3✶</sup> &nbsp;&nbsp;&nbsp;
+            <a href="https://zilongzheng.github.io/">Zilong Zheng</a><sup>1</sup> &nbsp;&nbsp;&nbsp;
+            <a href="https://liqing-ustc.github.io/">Qing Li</a><sup>1</sup> &nbsp;&nbsp;&nbsp;
+            <a href="https://web.cs.ucla.edu/~yliang/">Yitao Liang</a><sup>1,4</sup> &nbsp;&nbsp;&nbsp;
+            <a href="http://www.stat.ucla.edu/~sczhu/">Song-Chun Zhu</a><sup>1,2,3,4</sup>
+            <a href="https://siyuanhuang.com/">Siyuan Huang</a><sup>1</sup> &nbsp;&nbsp;&nbsp;
+          </p>
+
+          <p style="font-size: 0.9em; padding: 0.5em 0;">✶ indicates equal contribution</p>
+
+          <p style="font-size: 1em;">
+            <sup>1</sup>Beijing Institute for General Artificial Intelligence (BIGAI)<br>
+            <sup>2</sup>UCLA<br>
+            <sup>3</sup>Tsinghua University&nbsp;&nbsp;&nbsp;<sup>4</sup>Peking University<br>
+          </p>
+
+          <div style="margin: 1em 0; font-size: 1.1em;">
+            <p> <a href="https://arxiv.org/abs/2210.07474">arXiv</a> &nbsp;|&nbsp; </p>
+          </div>
+        </div>
+
+        <div class="has-text-centered" style="padding: 0 1em;">
+          <img src="./assets/teaser.jpg"/>
+          <p style="text-align: justify; font-size: 0.8em;">We introduce <b>SceneDiffuser</b>, a conditional generative model for 3D scene understanding. <b>SceneDiffuser</b> is applicable to various scene-conditioned 3D tasks: (a)<span style="color: #48B3B3;">human pose generation</span>, (b) <span style="color: #9F47B3;">human motion generation</span>, (c) <span style="color: #8FB300;">dexterous grasp generation</span>, (d) <span style="color: #3B4FB3">path planning for 3D navigation</span> with <span style="color: #B30000">goals</span>, and (e) <span style="color: #00B353">motion planning for robot arms</span>.</p>
+        </div>
+
+        <hr>
+
+        <div class="has-text-centered content-block">
+          <h2 class="sub-title">Abstract</h2>
+          <p style="text-align:justify; margin-bottom: 1.5em;">
+            We propose a new task to benchmark scene understanding of embodied agents: Situated Question Answering in 3D Scenes (SQA3D). Given a scene context (e.g., 3D scan), SQA3D requires the tested agent to first understand its situation (position, orientation, etc.) in the 3D scene as described by text, then reason about its surrounding environment and answer a question under that situation. Based upon 650 scenes from ScanNet, we provide a dataset centered around 6.8k unique situations, along with 20.4k descriptions and 33.4k diverse reasoning questions for these situations. These questions examine a wide spectrum of reasoning capabilities for an intelligent agent, ranging from spatial relation comprehension to commonsense understanding, navigation, and multi-hop reasoning. SQA3D imposes a significant challenge to current multi-modal especially 3D reasoning models. We evaluate various state-of-the-art approaches and find that the best one only achieves an overall score of <b>47.20%</b>, while amateur human participants can reach <b>90.06%</b>. We believe SQA3D could facilitate future embodied AI research with stronger situation understanding and reasoning capability.
+          </p>
+        </div>
+
+        <hr>
+
+        <div class="content-block">
+          <h2 class="sub-title has-text-centered">SQA data sample</h2>
+          
+          <div class="task">
+            <div class="columns is-centered" style="position: relative;">
+              <div style="position: absolute; left: 3%; top: 3%;">
+                <span style="font-size: 0.8em;">Scene </span>
+                <div class="select is-small">
+                  <select id="sceneSelector">
+                    <option>scene0000</option>
+                    <option>scene0014</option>
+                    <option>scene0017</option>
+                    <option>scene0024</option>
+                    <option>scene0034</option>
+                    <option>scene0035</option>
+                    <option>scene0046</option>
+                    <option>scene0047</option>
+                    <option>scene0051</option>
+                    <option>scene0054</option>
+                  </select>
+                </div>
+                &nbsp;&nbsp;&nbsp;
+                <span style="font-size: 0.8em;">Situation </span>
+                <div class="select is-small">
+                  <select id="situationSelector">
+                    <option>situation_0</option>
+                    <option>situation_1</option>
+                    <option>situation_2</option>
+                    <option>situation_3</option>
+                    <option>situation_4</option>
+                    <option>situation_5</option>
+                    <option>situation_6</option>
+                    <option>situation_7</option>
+                    <option>situation_8</option>
+                    <option>situation_9</option>
+                  </select>
+                </div>
+              </div>
+              <div id="loading" style="position: absolute; left: 50%; top: 45%;"></div>
+              <canvas id="webgl_scene" style="height: 50%; width: 50%;"></canvas>
+            </div>
+            <p id="situation" style="margin: 0 1.5em; font-size: 0.8em; text-align:justify;"><span style="color: #fff143">Situation:</span></p>
+            <p style="margin: 0 1.5em; font-size: 0.8em; text-align:justify;">Note: Click the select dropdown to select a scene and a corresponding situation in the scene. Drag to move your view around.</p>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="has-text-centered content-block">
+          <h2 class="sub-title">Bibtex</h2>
+          <p style="text-align:justify">If you find our project useful, please consider citing us:</p>
+          <div style="padding-top: 1rem; text-align: left;">
+<pre><code>
+@inproceedings{ma2022sqa3d,
+    title={SQA3D: Situated Question Answering in 3D Scenes},
+    author={Ma, Xiaojian and Yong, Silong and Zheng, Zilong and Li, Qing and Liang, Yitao and Zhu, Song-Chun and Huang, Siyuan},
+    booktitle={International Conference on Learning Representations},
+    year={2023},
+    url={https://openreview.net/forum?id=IDJx97BC38}
+}
+</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <footer class="footer" style="padding: 0 0 1.5rem 0">
+      <div class="columns">
+        <div class="column" :class="[content, offset]">
+          <hr>
+          <p class="has-text-centered" style="font-size: 0.9em;">This website is designed and coded by the authors. Send feedback and questions to <a href="https://silongyong.github.io/">Silong Yong</a></p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+
+<script type="module">
+  import { createApp } from 'vue'
+
+  let app = createApp({
+    data() {
+      return {
+        content: 'is-6',
+        offset: 'is-offset-3'
+      }
+    }
+  }).mount('#app')
+
+  function displayWindowSize() {
+    let w = document.documentElement.clientWidth;
+    // console.log(w)
+    let c
+    let o
+    if (w >= 1200) {
+      c = 'is-6'
+      o = 'is-offset-3'
+    } else {
+      if (w >= 900) {
+        c = 'is-8'
+        o = 'is-offset-2'
+      } else {
+        c = 'is-10'
+        o = 'is-offset-1'
+      }
+    }
+    app.$data.content = c
+    app.$data.offset = o
+  }
+  window.addEventListener("resize", displayWindowSize)
+  displayWindowSize()
+
+  import * as THREE from 'three'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+  import {PLYLoader} from 'three/addons/loaders/PLYLoader.js'
+  import qid2situation from './assets/qid2situation.json' assert {type: 'json'};
+
+  // scene & situation visualization
+  let canvas2 = document.querySelector('#webgl_scene')
+  let scene2 = new THREE.Scene()
+  let assetLoader2 = new PLYLoader()
+  let model2
+
+  let camera2 = new THREE.PerspectiveCamera(45, 1.618 / 1.0, 0.1, 100)
+  camera2.position.set(0.25, 0.2, -0.25)
+  let grid2 = new THREE.GridHelper(30, 30)
+  scene2.add(camera2)
+  scene2.add(grid2)
+  for (let ax = 0; ax < 3; ax++) {
+    for (let i = 0; i <= 1; i++) {
+      let spotLight = new THREE.SpotLight(0xAAAAAA)
+      spotLight.position.set(
+        ax == 0 ? 50 * (i * 2 - 1): 0,
+        ax == 1 ? 50 * (i * 2 - 1): 0,
+        ax == 2 ? 50 * (i * 2 - 1): 0,
+      )
+      scene2.add(spotLight)
+    }
+  }
+
+  let controls2 = new OrbitControls(camera2, canvas2)
+  controls2.enableZoom = true
+  // controls2.enableDamping = true
+  controls2.object.position.set(camera2.position.x, camera2.position.y, camera2.position.z)
+  controls2.target = new THREE.Vector3(0, 0, 0)
+  controls2.update()
+
+  let renderer2 = new THREE.WebGLRenderer({
+      canvas: canvas2,
+      alpha: true,
+  })
+  renderer2.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  renderer2.outputEncoding = THREE.sRGBEncoding
+  renderer2.setAnimationLoop(() => {
+    renderer2.render(scene2, camera2)
+  });
+
+  const sceneSel = document.querySelector('#sceneSelector')
+  const sitSel = document.querySelector('#situationSelector')
+  sceneSel.value = 'scene0000'
+  sitSel.value = 'situation_0'
+
+  function load_model2(e) {
+    if (sceneSel.value == '' || sitSel.value == '') {
+      return
+    }
+    scene2.remove(model2)
+    document.querySelector('#loading').innerHTML = `<img src="./assets/icons/loading.svg" width="48" height="48">`
+    let assetUrl = new URL(`./assets/${sceneSel.value}/${sitSel.value}.ply`, import.meta.url)
+    for (var item in qid2situation) { 
+      let situation_id = "situation_" + qid2situation[item]["number"]
+      if (qid2situation[item]["scene"] == sceneSel.value && situation_id == sitSel.value) {
+        document.querySelector("situation").innerText = "Situation: " + qid2situation[item]["situation"]
+        break
+      }
+    }
+    assetLoader2.load(assetUrl.href, ply => {
+      model2 = ply.scene
+      scene2.add(model2)
+      document.querySelector('#loading').innerHTML = ''
+    }, undefined, (error) => {console.error(error)})
+  }
+
+  sceneSel.addEventListener('change', (e) => {sitSel.value = ''})
+  sitSel.addEventListener('change', load_model2)
+  load_model2()
+
+  // resize renderers
+  function resizeRenderers() {
+    let content_width = document.querySelector('#results').offsetWidth
+    renderer1.setSize(content_width, content_width / 1.618)
+    renderer2.setSize(content_width, content_width / 1.618)
+  }
+  window.addEventListener('resize', () => {
+    resizeRenderers()
+  })
+  resizeRenderers()
+</script>
+
+</html>
