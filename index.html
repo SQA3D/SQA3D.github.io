@@ -94,7 +94,7 @@
         </div>
 
         <div class="has-text-centered" style="padding: 0 1em;">
-          <img src="./assets/teaser.JPG"/>
+          <img src="https://sqascannetviz.s3.us-west-1.amazonaws.com/sqa3d_website/teaser.JPG"/>
         </div>
 
         <hr>
@@ -110,12 +110,12 @@
 
         <div id="results" class="content-block">
           <h2 class="sub-title has-text-centered">SQA data sample</h2>
-          
+
           <div class="task">
             <div class="columns is-centered" style="position: relative;">
               <div style="position: absolute; left: 3%; top: 3%;">
-                <span style="font-size: 0.8em;">Scene </span>
-                <div class="select is-small">
+                <span style="font-size: 1.5em;">Scene </span>
+                <div class="select is-medium">
                   <select id="sceneSelector">
                     <option>scene0000</option>
                     <option>scene0014</option>
@@ -130,8 +130,8 @@
                   </select>
                 </div>
                 &nbsp;&nbsp;&nbsp;
-                <span style="font-size: 0.8em;">Situation </span>
-                <div class="select is-small">
+                <span style="font-size: 1.5em;">Situation </span>
+                <div class="select is-medium">
                   <select id="situationSelector">
                     <option>situation_0</option>
                     <option>situation_1</option>
@@ -145,11 +145,23 @@
                     <option>situation_9</option>
                   </select>
                 </div>
+                &nbsp;&nbsp;&nbsp;
+                <span style="font-size: 1.5em;">Question </span>
+                <div class="select is-medium">
+                  <select id="questionSelector">
+                    <option>question_0</option>
+                    <option>question_1</option>
+                    <option>question_2</option>
+                    <option>question_3</option>
+                    <option>question_4</option>
+                  </select>
+                </div>
               </div>
               <div id="loading" style="position: absolute; left: 50%; top: 45%;"></div>
               <canvas id="webgl_scene" style="height: 50%; width: 50%;"></canvas>
             </div>
-            <p id="sit_text" style="margin: 0 1.5em; font-size: 0.8em; text-align:justify;"><span style="color: #00ff00">Situation:</span></p>
+            <p id="sit_text" style="margin: 0 0.8em; font-size: 1.5em; text-align:justify;"><span style="color: #ffffff;background-color: #00dd00">Situation</span></p>
+            <p id="q_text" style="margin: 0 0.8em; font-size: 1.5em; text-align:justify;"><span style="color: #ffffff;background-color: #0000ff">Question</span></p>
             <p style="margin: 0 1.5em; font-size: 0.8em; text-align:justify;">Note: Click the select dropdown to select a scene and a corresponding situation in the scene. Drag to move your view around.</p>
           </div>
         </div>
@@ -174,12 +186,12 @@
 
       </div>
     </div>
-    
+
     <footer class="footer" style="padding: 0 0 1.5rem 0">
       <div class="columns">
         <div class="column" :class="[content, offset]">
           <hr>
-          <p class="has-text-centered" style="font-size: 0.9em;">This website is designed and coded by the authors. Send feedback and questions to <a href="https://silongyong.github.io/">Silong Yong</a></p>
+          <p class="has-text-centered" style="font-size: 0.9em;">This website is designed and coded by the authors (thanks <a href="https://scenediffuser.github.io/">SceneDiffuser</a> for the template). Send feedback and questions to <a href="https://silongyong.github.io/">Silong Yong</a> and <a href="https://jeasinema.github.io">Xiaojian Ma</a>.</p>
         </div>
       </div>
     </footer>
@@ -224,7 +236,7 @@
   import * as THREE from 'three'
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
   import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js'
-  import qid2situation from './assets/qid2situation.json' assert {type: 'json'};
+  import qid2situation from 'https://sqascannetviz.s3.us-west-1.amazonaws.com/sqa3d_website/qid2situation.json' assert {type: 'json'};
 
   // scene & situation visualization
   let canvas2 = document.querySelector('#webgl_scene')
@@ -233,7 +245,7 @@
   let model2
 
   let camera2 = new THREE.PerspectiveCamera(45, 1.618 / 1.0, 0.1, 100)
-  camera2.position.set(0.25, 0.2, -0.25)
+  camera2.position.set(5, 4, -5)
   camera2.add(new THREE.PointLight(0xffffff, 0.5))
   scene2.add(camera2)
   for (let ax = 0; ax < 3; ax++) {
@@ -267,21 +279,23 @@
 
   const sceneSel = document.querySelector('#sceneSelector')
   const sitSel = document.querySelector('#situationSelector')
+  const qSel = document.querySelector('#questionSelector')
   sceneSel.value = 'scene0000'
   sitSel.value = 'situation_0'
+  qSel.value = 'question_0'
 
   function load_model2(e) {
     if (sceneSel.value == '' || sitSel.value == '') {
       return
     }
     scene2.remove(model2)
-    document.querySelector('#loading').innerHTML = `<img src="./assets/icons/loading.svg" width="48" height="48">`
-    let assetUrl = new URL(`./assets/${sceneSel.value + "_00"}/${sitSel.value}.glb`, import.meta.url)
-    for (var item in qid2situation) { 
+    document.querySelector('#loading').innerHTML = `<img src="https://sqascannetviz.s3.us-west-1.amazonaws.com/sqa3d_website/icons/loading.svg" width="48" height="48">`
+    let assetUrl = new URL(`https://sqascannetviz.s3.us-west-1.amazonaws.com/sqa3d_website/${sceneSel.value + "_00"}/${sitSel.value}.glb`, import.meta.url)
+    for (var item in qid2situation) {
       let situation_id = "situation_" + qid2situation[item]["number"]
       let scene_id = sceneSel.value + "_00"
       if (qid2situation[item]["scene"] == scene_id && situation_id == sitSel.value) {
-        document.querySelector("#sit_text").innerHTML = `<span style="color: #00e400">Situation: ${qid2situation[item]["situation"]}</span>`
+        document.querySelector("#sit_text").innerHTML = `<span style="color: #ffffff;background-color: #00dd00">Situation</span> ${qid2situation[item]["situation"]}</span>`
         break
       }
     }
